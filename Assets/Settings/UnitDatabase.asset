@@ -17,26 +17,26 @@ MonoBehaviour:
     hp: 100
     atk: 10
     moveSpeed: 3
-    attackSpeed: 0
     attackRange: 1
     preAttackDelay: 1
     hitAttackDelay: 0.2
     postAttackDelay: 0.2
+    prefab: {fileID: 1476460008105567900, guid: 10cf5010f359c4949aea380ac7c8e121, type: 3}
   - unitId: hero2
     hp: 120
     atk: 5
     moveSpeed: 2
-    attackSpeed: 0
     attackRange: 1
     preAttackDelay: 2
     hitAttackDelay: 0.5
     postAttackDelay: 0.5
+    prefab: {fileID: 1476460008105567900, guid: 7bcde3a41d8ef456d892ea8ab0e1fc01, type: 3}
   - unitId: hero3
     hp: 50
     atk: 20
     moveSpeed: 3
-    attackSpeed: 0
     attackRange: 3
     preAttackDelay: 0.5
     hitAttackDelay: 0.2
     postAttackDelay: 0.3
+    prefab: {fileID: 1476460008105567900, guid: 919ccba7e515a45e6a230cf7c69b1177, type: 3}

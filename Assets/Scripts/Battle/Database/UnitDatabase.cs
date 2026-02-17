@@ -23,5 +23,6 @@ namespace Battle.Database
         public float hp, atk;
         public float moveSpeed, attackRange;
         public float preAttackDelay, hitAttackDelay, postAttackDelay;
+        public GameObject prefab;
     }
 }

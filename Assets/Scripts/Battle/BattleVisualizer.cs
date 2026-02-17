@@ -1,18 +1,13 @@
 using System.Collections.Generic;
 using Battle.Event;
 using Battle.View;
+using Pool;
 using UnityEngine;
 
 namespace Battle
 {
     public class BattleVisualizer : MonoBehaviour
     {
-        [Header("Prefabs")] 
-        public GameObject UnitPrefab;
-
-        [Header("Container")] 
-        public Transform UnitContainer;
-
         private Dictionary<int, UnitView> _unitViews = new Dictionary<int, UnitView>();
 
         public void SpawnInitialUnits(List<UnitState> units)
@@ -20,7 +15,7 @@ namespace Battle
             _unitViews.Clear();
             foreach (var unit in units)
             {
-                var go = Instantiate(UnitPrefab, unit.position, Quaternion.identity, UnitContainer);
+                var go = unit.data.prefab.Spawn(transform, unit.position);
                 var view = go.GetComponent<UnitView>();
                 view.Initialize(unit);
                 _unitViews[unit.id] = view;

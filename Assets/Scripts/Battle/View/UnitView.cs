@@ -1,3 +1,4 @@
+using Pool;
 using UnityEngine;
 
 namespace Battle.View
@@ -35,7 +36,7 @@ namespace Battle.View
         // 사망
         public void OnDie()
         {
-            Destroy(gameObject);
+            gameObject.Release();
         }
     }
 }

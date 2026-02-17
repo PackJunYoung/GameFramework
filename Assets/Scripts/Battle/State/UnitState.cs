@@ -1,4 +1,4 @@
-using Battle.Database;
+using Database;
 using UnityEngine;
 
 namespace Battle

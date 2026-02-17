@@ -5,48 +5,86 @@ using UnityEngine;
 
 namespace Battle
 {
-    public class BattleManager : MonoBehaviour
+    public class ReplayManager : MonoBehaviour
     {
         [SerializeField] private BattleVisualizer _visualizer;
         [SerializeField] private BattleContainer _container;
-        
+        [SerializeField] private float _playbackSpeed;
+
         private BattleSimulator _simulator;
-        private bool _isComplete;
+        private bool _isSimulationFinished;
+        private float _playbackTimer;
+
+        // 시뮬레이션 결과(이벤트들)를 저장할 큐
+        private Queue<List<BattleEvent>> _eventQueue = new Queue<List<BattleEvent>>();
+
+        private const float STEP = 0.033f;
 
         private void Start()
         {
-            StartBattle(1, 2);
-        }        
-        
-        private void StartBattle(int teamA, int teamB)
+            StartReplay(1, 2);
+        }
+
+        private void StartReplay(int teamA, int teamB)
         {
+            // 1. 유닛 정보 생성
             var unitInfos = GetUnitInfos(teamA, teamB);
 
-            // 초기 유닛들 소환
+            // 2. 비주얼라이저에 초기 위치 전달 (시뮬레이션 돌리기 전의 위치)
             _visualizer.SpawnInitialUnits(unitInfos);
-            
-            // 시뮬레이터 생성
+
+            // 3. 시뮬레이터 생성
             _simulator = new BattleSimulator(123, unitInfos);
+
+            // 4. 전투가 끝날 때까지 미리 시뮬레이션 수행
+            var totalSimulatedTime = 0f;
+
+            while (_simulator.GetWinnerTeam() == 0 && totalSimulatedTime < 180f) // 최대 3분 제한
+            {
+                var frameEvents = _simulator.Tick(STEP);
+                _eventQueue.Enqueue(frameEvents);
+                
+                totalSimulatedTime += STEP;
+            }
+
+            _isSimulationFinished = true;
+            Debug.Log($"시뮬레이션 완료: 총 {totalSimulatedTime:F2}초 분량");
         }
 
         private void Update()
         {
-            if (_isComplete) 
+            // 시뮬레이션이 끝나지 않았거나, 더 이상 재생할 프레임이 없으면 중단
+            if (!_isSimulationFinished || _eventQueue.Count == 0)
                 return;
-            
-            var dt = Time.deltaTime;
-            var frameEvents = _simulator.Tick(dt);
 
-            _visualizer.PlayEvents(frameEvents);
+            _playbackTimer += Time.deltaTime * _playbackSpeed;
 
-            var winnerTeam = _simulator.GetWinnerTeam();
-            if (winnerTeam != 0)
+            while (_playbackTimer >= STEP && _eventQueue.Count > 0)
             {
-                _isComplete = true;
-                Debug.Log($"팀 {winnerTeam} 승리!!!");
+                var eventsToPlay = _eventQueue.Dequeue();
+                if (eventsToPlay.Count > 0)
+                {
+                    _visualizer.PlayEvents(eventsToPlay);
+                }
+
+                _playbackTimer -= STEP;
+            }
+
+            if (_eventQueue.Count == 0)
+                CheckWinner();
+        }
+
+        private void CheckWinner()
+        {
+            var winner = _simulator.GetWinnerTeam();
+            if (winner != 0)
+            {
+                Debug.Log($"팀 {winner} 승리!!!");
+                enabled = false; // 업데이트 중지
             }
         }
 
+        // GetUnitInfos 및 기타 헬퍼 메서드는 기존과 동일...
         private List<UnitState> GetUnitInfos(int teamA, int teamB)
         {
             var teamPoints = _container.GetComponentsInChildren<TeamPoint>();

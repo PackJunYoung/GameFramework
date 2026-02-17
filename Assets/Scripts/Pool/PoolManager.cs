@@ -1,30 +1,13 @@
 using System.Collections.Generic;
+using Base;
 using UnityEngine;
 using UnityEngine.Pool;
 
 namespace Pool
 {
-    public class PoolManager : MonoBehaviour
+    public class PoolManager : BaseManager<PoolManager>
     {
         private Dictionary<GameObject, IObjectPool<GameObject>> _pools = new();
-
-        private static PoolManager _instance;
-        public static PoolManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = FindFirstObjectByType<PoolManager>();
-                    if (_instance == null)
-                    {
-                        var go = new GameObject("PoolManager");
-                        _instance = go.AddComponent<PoolManager>();
-                    }
-                }
-                return _instance;
-            }
-        }
 
         /// <summary>
         /// 오브젝트를 풀에서 가져옵니다.

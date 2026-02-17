@@ -133,17 +133,6 @@ namespace Battle
             }
         }
 
-        // [밸런스 테스트용] 백그라운드 초고속 시뮬레이션
-        // public async Task<List<BattleEvent>> RunSimulationAsync() {
-        //     return await Task.Run(() => {
-        //         var totalLogs = new List<BattleEvent>();
-        //         while (_currentTime < 300f && GetWinnerTeam() == 0) {
-        //             totalLogs.AddRange(Tick(0.05f)); // 0.05초씩 강제로 시간을 워프
-        //         }
-        //         return totalLogs;
-        //     });
-        // }
-
         private void AddUnit(UnitState unit)
         {
             _unitDict.Add(unit.id, unit);

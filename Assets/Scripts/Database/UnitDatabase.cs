@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Battle.Database
+namespace Database
 {
     [CreateAssetMenu(fileName = "UnitDatabase", menuName = "Battle/UnitDatabase")]
     public class UnitDatabase : ScriptableObject

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Battle.Event;
 using UnityEngine;
 using Random = System.Random;
 
@@ -67,6 +68,7 @@ namespace Battle
                 unit.actionGauge += unit.attackSpeed * dt;
                 if (unit.actionGauge >= unit.PreAttackDelay) {
                     unit.ChangeAction(UnitActionState.Attack);
+                    events.Add(AttackStartEvent.New(_currentTime, unit.id));
                 }
             } else {
                 unit.ChangeAction(UnitActionState.Move);
@@ -91,7 +93,7 @@ namespace Battle
 
             var dir = (target.position - unit.position).normalized;
             unit.position += dir * unit.MoveSpeed * dt;
-            events.Add(new MoveEvent { timestamp = _currentTime, unitId = unit.id, position = unit.position });
+            events.Add(MoveEvent.New(_currentTime, unit.id, unit.position));
         }
 
         private void HandleAttack(List<BattleEvent> events, UnitState unit, float dt)
@@ -109,14 +111,24 @@ namespace Battle
                 if (unit.actionGauge >= unit.PostAttackDelay)
                 {
                     unit.ChangeAction(UnitActionState.Idle);
+                    events.Add(AttackEndEvent.New(_currentTime, unit.id));
                 }
             }
             else
             {
                 if (unit.actionGauge >= unit.HitAttackDelay)
                 {
-                    unit.OnHit();
-                    events.Add(new AttackEvent { timestamp = _currentTime, attackerId = unit.id, targetId = target.id, damage = unit.Atk });
+                    var damage = unit.Atk;
+                    unit.DoHit();
+                    target.OnHit(damage);
+                    if (target.currentActionState == UnitActionState.Die)
+                    {
+                        events.Add(DieEvent.New(_currentTime, target.id));
+                    }
+                    else
+                    {
+                        events.Add(HitEvent.New(_currentTime, target.id, damage));
+                    }
                 }
             }
         }

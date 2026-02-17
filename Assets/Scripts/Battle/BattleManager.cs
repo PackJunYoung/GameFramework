@@ -14,32 +14,40 @@ namespace Battle
         [SerializeField] private BattleVisualizer _visualizer;
         
         private BattleSimulator _simulator;
+        private bool _isComplete;
 
         private void Start()
         {
-            StartLiveBattle(1, 2);
+            StartBattle(1, 2);
         }        
         
-        private void StartLiveBattle(int teamA, int teamB)
+        private void StartBattle(int teamA, int teamB)
         {
             var unitInfos = GetUnitInfos(teamA, teamB);
 
-            // 시뮬레이터 생성 (연산 준비만 완료)
+            // 시뮬레이터 생성
             _simulator = new BattleSimulator(123, unitInfos);
 
-            // 초기 유닛들 소환 (Visualizer)
+            // 초기 유닛들 소환
             _visualizer.SpawnInitialUnits(unitInfos);
         }
 
         private void Update()
         {
-            // [핵심] 이번 프레임(DeltaTime)만큼만 로직을 진행시킵니다.
-            // 유저가 버튼을 눌렀다면 _inputQueue에 데이터가 담겨있을 것입니다.
+            if (_isComplete) 
+                return;
+            
             var dt = Time.deltaTime;
             var frameEvents = _simulator.Tick(dt);
 
-            // 이번 틱(0.016초 등)에 발생한 사건만 즉시 연출합니다.
-            _visualizer.PlayInstantEvents(frameEvents);
+            _visualizer.PlayEvents(frameEvents);
+
+            var winnerTeam = _simulator.GetWinnerTeam();
+            if (winnerTeam != 0)
+            {
+                _isComplete = true;
+                Debug.Log($"팀 {winnerTeam} 승리!!!");
+            }
         }
 
         private List<UnitState> GetUnitInfos(int teamA, int teamB)

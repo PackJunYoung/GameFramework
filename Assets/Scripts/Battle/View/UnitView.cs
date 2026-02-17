@@ -31,5 +31,11 @@ namespace Battle.View
         {
             FlashView();
         }
+        
+        // 사망
+        public void OnDie()
+        {
+            Destroy(gameObject);
+        }
     }
 }

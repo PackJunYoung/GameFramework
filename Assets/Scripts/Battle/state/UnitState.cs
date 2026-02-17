@@ -56,10 +56,20 @@ namespace Battle
             }
         }
 
-        public void OnHit()
+        public void DoHit()
         {
             afterHit = true;
             actionGauge = 0f;
+        }
+
+        public void OnHit(float damage)
+        {
+            curHp -= damage;
+            if (curHp <= 0f)
+            {
+                curHp = 0f;
+                currentActionState = UnitActionState.Die;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Battle.Event;
 using Battle.View;
 using UnityEngine;
 
@@ -26,31 +27,44 @@ namespace Battle
             }
         }
 
-        public void PlayInstantEvents(List<BattleEvent> events)
+        public void PlayEvents(List<BattleEvent> events)
         {
             if (events == null || events.Count == 0)
                 return;
 
             foreach (var e in events)
             {
-                switch (e)
+                if (_unitViews.TryGetValue(e.unitId, out var unit))
                 {
-                    case MoveEvent move:
+                    switch (e)
                     {
-                        if (_unitViews.TryGetValue(move.unitId, out var mover))
+                        case MoveEvent move:
                         {
-                            mover.OnMove(move.position);
+                            unit.OnMove(move.position);
                         }
+                            break;
+                        case AttackStartEvent attackStart:
+                        {
+                            // 대기 모션 전환
+                        }
+                            break;
+                        case AttackEndEvent attackEnd:
+                        {
+                            // 공격 모션 전환
+                        }
+                            break;
+                        case HitEvent hit:
+                        {
+                            unit.OnDamage(hit.damage);
+                        }
+                            break;
+                        case DieEvent die:
+                        {
+                            // 사망
+                            unit.OnDie();
+                        }
+                            break;
                     }
-                        break;
-                    case AttackEvent attack:
-                    {
-                        if (_unitViews.TryGetValue(attack.targetId, out var target))
-                        {
-                            target.OnDamage(attack.damage);
-                        }
-                    } 
-                        break;
                 }
             }
         }

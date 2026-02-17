@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Battle.DamageText;
 using Battle.Event;
 using Battle.View;
 using Pool;
@@ -51,6 +52,7 @@ namespace Battle
                         case HitEvent hit:
                         {
                             unit.OnDamage(hit.damage);
+                            DamageTextManager.Instance.Spawn(hit.damage, unit.transform.position);
                         }
                             break;
                         case DieEvent die:

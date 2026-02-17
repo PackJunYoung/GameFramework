@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Database;
 using UnityEngine;
 
 namespace Battle
@@ -20,7 +17,7 @@ namespace Battle
         
         private void StartBattle(int teamA, int teamB)
         {
-            var unitInfos = GetUnitInfos(teamA, teamB);
+            var unitInfos = _container.GetUnitInfos(teamA, teamB);
 
             // 초기 유닛들 소환
             _visualizer.SpawnInitialUnits(unitInfos);
@@ -45,44 +42,6 @@ namespace Battle
                 _isComplete = true;
                 Debug.Log($"팀 {winnerTeam} 승리!!!");
             }
-        }
-
-        private List<UnitState> GetUnitInfos(int teamA, int teamB)
-        {
-            var teamPoints = _container.GetComponentsInChildren<TeamPoint>();
-            var teamPointA = teamPoints.FirstOrDefault(i => i.Index == teamA);
-            var teamPointB = teamPoints.FirstOrDefault(i => i.Index == teamB);
-            if (teamPointA == null || teamPointB == null)
-                throw new MissingReferenceException();
-
-            var teamDatabase = DataManager.GetTeamDatabase();
-            var unitDatabase = DataManager.GetUnitDatabase();
-            var unitInfos = new List<UnitState>();
-            var teamAData = teamDatabase.teams.FirstOrDefault(i => i.teamId == teamA);
-            var teamBData = teamDatabase.teams.FirstOrDefault(i => i.teamId == teamB);
-            if (teamAData == null || teamBData == null) 
-                return unitInfos;
-
-            var id = 0;
-            for (var i = 0; i < teamAData.unitIds.Count; i++)
-            {
-                var unitId = teamAData.unitIds[i];
-                var unitData = unitDatabase.units.FirstOrDefault(data => data.unitId == unitId);
-                if (unitData == null) continue;
-                var unitState = new UnitState(id++, 0, teamPointA.GetPoint(i).position, unitData);
-                unitInfos.Add(unitState);
-            }
-
-            for (var i = 0; i < teamBData.unitIds.Count; i++)
-            {
-                var unitId = teamBData.unitIds[i];
-                var unitData = unitDatabase.units.FirstOrDefault(data => data.unitId == unitId);
-                if (unitData == null) continue;
-                var unitState = new UnitState(id++, 1, teamPointB.GetPoint(i).position, unitData);
-                unitInfos.Add(unitState);
-            }
-
-            return unitInfos;
         }
     }
 }

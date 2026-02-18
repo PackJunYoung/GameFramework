@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Battle.Cam;
 using Battle.DamageText;
 using Battle.Event;
+using Battle.HUD;
 using Battle.View;
 using Pool;
 using UnityEngine;
@@ -36,7 +38,7 @@ namespace Battle
                     {
                         case MoveEvent move:
                         {
-                            unit.OnMove(move.position);
+                            unit.PlayMove(move.position);
                         }
                             break;
                         case AttackStartEvent attackStart:
@@ -51,14 +53,13 @@ namespace Battle
                             break;
                         case HitEvent hit:
                         {
-                            unit.OnDamage(hit.damage);
-                            DamageTextManager.Instance.Spawn(hit.damage, unit.transform.position);
+                            unit.PlayHit(hit);
                         }
                             break;
                         case DieEvent die:
                         {
                             // 사망
-                            unit.OnDie();
+                            unit.PlayDie();
                         }
                             break;
                     }

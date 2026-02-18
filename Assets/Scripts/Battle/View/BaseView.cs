@@ -9,6 +9,8 @@ namespace Battle.View
         private MeshRenderer _meshRenderer;
         
         private Tween _flashTween;
+
+        public int Id => _id;
         
         protected void Initialize(int id)
         {

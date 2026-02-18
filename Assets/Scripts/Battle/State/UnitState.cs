@@ -18,6 +18,7 @@ namespace Battle
         public float curHp;
         public float attackSpeed;
 
+        public float MaxHp => data.hp;
         public float Atk => data.atk;
         public float MoveSpeed => data.moveSpeed;
         public float AttackRange => data.attackRange;

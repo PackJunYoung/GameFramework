@@ -1,3 +1,6 @@
+using Battle.DamageText;
+using Battle.Event;
+using Battle.HUD;
 using Pool;
 using UnityEngine;
 
@@ -13,6 +16,7 @@ namespace Battle.View
             Initialize(state.id);
             
             _logicPosition = state.position;
+            HUDManager.Instance.AttachHPBar(this, state.MaxHp);
         }
         
         // 목표 위치로 이동
@@ -22,20 +26,23 @@ namespace Battle.View
         }
 
         // 목표 위치를 변경
-        public void OnMove(Vector3 newPos)
+        public void PlayMove(Vector3 newPos)
         {
             _logicPosition = newPos;
         }
 
         // 피격
-        public void OnDamage(float damage)
+        public void PlayHit(HitEvent hit)
         {
             FlashView();
+            DamageTextManager.Instance.Spawn(hit.damage, transform.position);
+            HUDManager.Instance.UpdateHP(Id, hit.curHp, hit.maxHp);
         }
         
         // 사망
-        public void OnDie()
+        public void PlayDie()
         {
+            HUDManager.Instance.DetachHPBar(Id);
             gameObject.Release();
         }
     }

@@ -1,3 +1,4 @@
+using Battle.Cam;
 using DG.Tweening;
 using Pool;
 using TMPro;
@@ -22,7 +23,8 @@ namespace Battle.DamageText
             _text.alpha = 1f;
         
             // 2. 월드 좌표 -> 스크린 좌표 변환
-            var screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+            var mainCam = CameraManager.Instance.GetCamera();
+            var screenPos = mainCam.WorldToScreenPoint(worldPosition);
             transform.position = screenPos;
             transform.localScale = Vector3.one * 0.5f; // 작게 시작
 

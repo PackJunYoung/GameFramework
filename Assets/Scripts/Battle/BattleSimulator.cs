@@ -127,7 +127,7 @@ namespace Battle
                     }
                     else
                     {
-                        events.Add(HitEvent.New(_currentTime, target.id, damage));
+                        events.Add(HitEvent.New(_currentTime, target.id, damage, target.curHp, target.MaxHp));
                     }
                 }
             }

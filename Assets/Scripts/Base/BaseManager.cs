@@ -29,10 +29,10 @@ namespace Base
                         _instance = go.AddComponent<T>();
                     }
                         
-                    _instance.Initialize();
                     DontDestroyOnLoad(_instance.gameObject);
                 }
 
+                _instance.Initialize();
                 return _instance;
             }
         }

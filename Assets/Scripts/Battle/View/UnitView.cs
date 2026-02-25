@@ -35,8 +35,20 @@ namespace Battle.View
         public void PlayHit(HitEvent hit)
         {
             FlashView();
-            DamageTextManager.Instance.Spawn(hit.damage, transform.position);
+            DamageTextManager.Instance.Spawn(hit.hit, transform.position);
             HUDManager.Instance.UpdateHP(Id, hit.curHp, hit.maxHp);
+        }
+        
+        // 피해
+        public void PlayDamage(DamageEvent damage)
+        {
+            HUDManager.Instance.UpdateHP(Id, damage.curHp, damage.maxHp);
+        }
+        
+        // 회복
+        public void PlayRecovery(RecoveryEvent recovery)
+        {
+            HUDManager.Instance.UpdateHP(Id, recovery.curHp, recovery.maxHp);
         }
         
         // 사망

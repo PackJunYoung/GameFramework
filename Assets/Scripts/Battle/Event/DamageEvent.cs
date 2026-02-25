@@ -1,18 +1,18 @@
 namespace Battle.Event
 {
-    public class HitEvent : BattleEvent
+    public class DamageEvent : BattleEvent
     {
-        public HitResult hit;
+        public float amount;
         public float curHp;
         public float maxHp;
 
-        public static HitEvent New(float timestamp, int unitId, HitResult hit, float curHp, float maxHp)
+        public static DamageEvent New(float timestamp, int unitId, float amount, float curHp, float maxHp)
         {
-            return new HitEvent()
+            return new DamageEvent()
             {
                 timestamp = timestamp,
                 unitId = unitId,
-                hit = hit,
+                amount = amount,
                 curHp = curHp,
                 maxHp = maxHp
             };

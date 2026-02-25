@@ -14,29 +14,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   units:
   - unitId: hero1
-    hp: 100
-    atk: 10
-    moveSpeed: 3
     attackRange: 1
+    moveSpeed: 3
     preAttackDelay: 1
-    hitAttackDelay: 0.2
     postAttackDelay: 0.2
+    attackType: 0
     prefab: {fileID: 1476460008105567900, guid: 10cf5010f359c4949aea380ac7c8e121, type: 3}
+    hp: 100
+    attack: 10
+    pDefense: 10
+    mDefense: 10
+    attackSpeed: 1
+    cooldownReduction: 10
+    penetration: 10
+    criticalRate: 10
+    criticalDamage: 10
+    criticalResist: 10
+    accuracy: 10
+    evasion: 10
+    blockPenetration: 10
+    blockRate: 10
   - unitId: hero2
-    hp: 120
-    atk: 5
-    moveSpeed: 2
     attackRange: 1
+    moveSpeed: 2
     preAttackDelay: 2
-    hitAttackDelay: 0.5
     postAttackDelay: 0.5
+    attackType: 0
     prefab: {fileID: 1476460008105567900, guid: 7bcde3a41d8ef456d892ea8ab0e1fc01, type: 3}
+    hp: 120
+    attack: 10
+    pDefense: 10
+    mDefense: 10
+    attackSpeed: 1
+    cooldownReduction: 10
+    penetration: 10
+    criticalRate: 10
+    criticalDamage: 10
+    criticalResist: 10
+    accuracy: 10
+    evasion: 10
+    blockPenetration: 10
+    blockRate: 10
   - unitId: hero3
-    hp: 50
-    atk: 20
-    moveSpeed: 3
     attackRange: 3
+    moveSpeed: 3
     preAttackDelay: 0.5
-    hitAttackDelay: 0.2
     postAttackDelay: 0.3
+    attackType: 0
     prefab: {fileID: 1476460008105567900, guid: 919ccba7e515a45e6a230cf7c69b1177, type: 3}
+    hp: 50
+    attack: 10
+    pDefense: 10
+    mDefense: 10
+    attackSpeed: 1
+    cooldownReduction: 10
+    penetration: 10
+    criticalRate: 10
+    criticalDamage: 10
+    criticalResist: 10
+    accuracy: 10
+    evasion: 10
+    blockPenetration: 10
+    blockRate: 10

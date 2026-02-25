@@ -14,13 +14,15 @@ namespace Battle.DamageText
 
         private Sequence _sequence;
 
-        public void Show(float damage, Vector3 worldPosition)
+        public void Show(string result, Vector3 worldPosition, Color color, int fontSize)
         {
             // 1. 초기화 (이전 트윈이 돌고 있다면 강제 종료)
             _sequence?.Kill();
         
-            _text.text = damage.ToString("F0");
+            _text.text = result;
             _text.alpha = 1f;
+            _text.color = color;
+            _text.fontSize = fontSize;
         
             // 2. 월드 좌표 -> 스크린 좌표 변환
             var mainCam = CameraManager.Instance.GetCamera();

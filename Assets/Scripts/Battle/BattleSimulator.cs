@@ -1,22 +1,22 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.Event;
 using UnityEngine;
-using Random = System.Random;
 
 namespace Battle
 {
-    public class BattleSimulator
+    public partial class BattleSimulator
     {
         private float _currentTime;
-        private Random _random;
+        private System.Random _random;
 
         private Dictionary<int, UnitState> _unitDict = new Dictionary<int, UnitState>();
         private List<UnitState> _unitList = new List<UnitState>();
 
         public BattleSimulator(int seed, List<UnitState> units)
         {
-            _random = new Random(seed);
+            _random = new System.Random(seed);
             _currentTime = 0f;
             units.ForEach(AddUnit);
         }
@@ -65,11 +65,8 @@ namespace Battle
             var dist = Vector3.Distance(unit.position, target.position);
             if (dist <= unit.AttackRange)
             {
-                unit.actionGauge += unit.attackSpeed * dt;
-                if (unit.actionGauge >= unit.PreAttackDelay) {
-                    unit.ChangeAction(UnitActionState.Attack);
-                    events.Add(AttackStartEvent.New(_currentTime, unit.id));
-                }
+                unit.ChangeAction(UnitActionState.Attack);
+                events.Add(AttackStartEvent.New(_currentTime, unit.id));
             } else {
                 unit.ChangeAction(UnitActionState.Move);
             }
@@ -105,7 +102,7 @@ namespace Battle
                 return;
             }
 
-            unit.actionGauge += unit.attackSpeed * dt;
+            unit.actionGauge += unit.AttackSpeed * dt;
             if (unit.afterHit)
             {
                 if (unit.actionGauge >= unit.PostAttackDelay)
@@ -116,18 +113,28 @@ namespace Battle
             }
             else
             {
-                if (unit.actionGauge >= unit.HitAttackDelay)
+                if (unit.actionGauge >= unit.PreAttackDelay)
                 {
-                    var damage = unit.Atk;
-                    unit.DoHit();
-                    target.OnHit(damage);
+                    var hit = Calculate(unit, target);
+                    unit.DoHit(hit);
+                    target.OnHit(hit);
+                    if (unit.currentActionState == UnitActionState.Die)
+                    {
+                        events.Add(DieEvent.New(_currentTime, unit.id));
+                    }
+                    else
+                    {
+                        if (hit.reflectedDamage > 0f) events.Add(DamageEvent.New(_currentTime, unit.id, hit.reflectedDamage, unit.curHp, unit.MaxHp));
+                        if (hit.lifeStealAmount > 0f) events.Add(RecoveryEvent.New(_currentTime, unit.id, hit.lifeStealAmount, unit.curHp, unit.MaxHp));
+                    }
+                    
                     if (target.currentActionState == UnitActionState.Die)
                     {
                         events.Add(DieEvent.New(_currentTime, target.id));
                     }
                     else
                     {
-                        events.Add(HitEvent.New(_currentTime, target.id, damage, target.curHp, target.MaxHp));
+                        events.Add(HitEvent.New(_currentTime, target.id, hit, target.curHp, target.MaxHp));
                     }
                 }
             }

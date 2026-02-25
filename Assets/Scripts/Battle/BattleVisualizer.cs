@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using Battle.Cam;
-using Battle.DamageText;
 using Battle.Event;
-using Battle.HUD;
 using Battle.View;
 using Pool;
 using UnityEngine;
@@ -54,6 +51,16 @@ namespace Battle
                         case HitEvent hit:
                         {
                             unit.PlayHit(hit);
+                        }
+                            break;
+                        case DamageEvent damage:
+                        {
+                            unit.PlayDamage(damage);
+                        }
+                            break;
+                        case RecoveryEvent recovery:
+                        {
+                            unit.PlayRecovery(recovery);
                         }
                             break;
                         case DieEvent die:

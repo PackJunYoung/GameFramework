@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26fc58719b5246339d4f4bbf47966a2f, type: 3}
+  m_Name: AreaAttackPattern_1
+  m_EditorClassIdentifier: 
+  preAttackDelay: 1
+  postAttackDelay: 1
+  approachRange: 2
+  baseMultiplier: 1
+  attackRange: 3
+  sectorAngle: 90

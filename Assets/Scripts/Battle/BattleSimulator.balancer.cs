@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Database;
 using UnityEngine;
 
@@ -63,6 +64,76 @@ namespace Battle
              result.reflectedDamage = result.finalDamage * target.ReflectDamage;
  
              return result;
+         }
+         
+         private List<UnitState> GetTargetsInSector(UnitState attacker, float range, float sectorAngle)
+         {
+             var targets = new List<UnitState>();
+             
+             var mainTarget = GetTarget(attacker.targetId);
+             if (mainTarget == null) return targets;
+
+             // 공격 방향 벡터 = (메인 타겟 위치 - 공격자 위치).normalized
+             var attackDirection = GetDirection(attacker.position, mainTarget.position);
+
+             // 1. 우선 사거리(Radius) 안에 있는 적들만 먼저 후보로 뽑습니다.
+             var candidates = GetTargetsInRange(attacker, range);
+             
+             foreach (var target in candidates)
+             {
+                 // 공격자에서 이 타겟으로의 방향
+                 var dirToTarget = GetDirection(attacker.position, target.position);
+
+                 // 3. 내적(Dot Product)을 이용한 각도 계산 (Vector3.Angle의 Pure C# 구현)
+                 // 두 벡터의 내적값은 두 방향 사이의 코사인(cos) 값과 같습니다.
+                 var dot = Vector3.Dot(attackDirection, dirToTarget);
+        
+                 // 내적값을 이용해 역코사인(Acos)을 구하면 라디안 각도가 나오고, 이를 도(Degree)로 변환합니다.
+                 var angle = Mathf.Acos(Mathf.Clamp(dot, -1f, 1f)) * Mathf.Rad2Deg;
+
+                 // 4. 부채꼴 판정
+                 if (angle <= sectorAngle * 0.5f)
+                 {
+                     targets.Add(target);
+                 }
+             }
+
+             return targets;
+         }
+         
+         private List<UnitState> GetTargetsInRange(UnitState attacker, float range)
+         {
+             var targets = new List<UnitState>();
+
+             // 전체 유닛 리스트를 순회 (Manager 등에서 관리하는 리스트)
+             foreach (var unit in _unitList)
+             {
+                 // 1. 자기 자신 제외
+                 if (unit.id == attacker.id) continue;
+
+                 // 2. 살아있는 상태인지 확인
+                 if (unit.currentActionState == UnitActionState.Die) continue;
+
+                 // 3. 적군인지 확인 (팀이 다른 경우)
+                 if (unit.teamId == attacker.teamId) continue;
+
+                 // 4. 거리 계산 (성능을 위해 제곱 거리를 사용하기도 함)
+                 // 사거리 안에 들어왔다면 리스트에 추가
+                 if (Vector3.Distance(attacker.position, unit.position) <= range)
+                 {
+                     targets.Add(unit);
+                 }
+             }
+
+             return targets;
+         }
+         
+         // 방향 벡터를 구하는 유틸리티 함수 (Pure C#)
+         private Vector3 GetDirection(Vector3 from, Vector3 to)
+         {
+             var dir = to - from;
+             dir.y = 0; // 2D 평면 판정을 위해 높이값 제거
+             return dir.normalized;
          }
     }
 }

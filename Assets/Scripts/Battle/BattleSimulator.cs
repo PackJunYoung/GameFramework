@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Battle.Attack;
 using Battle.Event;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace Battle
             return events;
         }
 
-        private void ProcessUnit(List<BattleEvent> events, UnitState unit, float dt)
+        private void ProcessUnit(ICollection<BattleEvent> events, UnitState unit, float dt)
         {
             switch (unit.currentActionState)
             {
@@ -56,14 +57,16 @@ namespace Battle
             }
         }
 
-        private void HandleIdle(List<BattleEvent> events, UnitState unit, float dt)
+        private void HandleIdle(ICollection<BattleEvent> events, UnitState unit, float dt)
         {
             var target = FindClosestTarget(unit);
             if (target == null) return;
+            
+            unit.RenewCurrentAttackPattern();
 
             unit.targetId = target.id;
             var dist = Vector3.Distance(unit.position, target.position);
-            if (dist <= unit.AttackRange)
+            if (dist <= unit.ApproachRange)
             {
                 unit.ChangeAction(UnitActionState.Attack);
                 events.Add(AttackStartEvent.New(_currentTime, unit.id));
@@ -72,7 +75,7 @@ namespace Battle
             }
         }
 
-        private void HandleMove(List<BattleEvent> events, UnitState unit, float dt)
+        private void HandleMove(ICollection<BattleEvent> events, UnitState unit, float dt)
         {
             var target = GetTarget(unit.targetId);
             if (target == null)
@@ -80,9 +83,11 @@ namespace Battle
                 unit.ChangeAction(UnitActionState.Idle);
                 return;
             }
+            
+            unit.RenewCurrentAttackPattern();
 
             var dist = Vector3.Distance(unit.position, target.position);
-            if (dist <= unit.AttackRange)
+            if (dist <= unit.ApproachRange)
             {
                 unit.ChangeAction(UnitActionState.Idle);
                 return;
@@ -93,7 +98,7 @@ namespace Battle
             events.Add(MoveEvent.New(_currentTime, unit.id, unit.position));
         }
 
-        private void HandleAttack(List<BattleEvent> events, UnitState unit, float dt)
+        private void HandleAttack(ICollection<BattleEvent> events, UnitState unit, float dt)
         {
             var target = GetTarget(unit.targetId);
             if (target == null)
@@ -115,28 +120,44 @@ namespace Battle
             {
                 if (unit.actionGauge >= unit.PreAttackDelay)
                 {
-                    var hit = Calculate(unit, target);
-                    unit.DoHit(hit);
-                    target.OnHit(hit);
-                    if (unit.currentActionState == UnitActionState.Die)
+                    if (unit.currentAttackPattern is SingleAttackPattern singleAttack)
                     {
-                        events.Add(DieEvent.New(_currentTime, unit.id));
+                        ApplyHit(events, unit, target, singleAttack.baseMultiplier);
                     }
-                    else
+                    else if (unit.currentAttackPattern is AreaAttackPattern areaAttack)
                     {
-                        if (hit.reflectedDamage > 0f) events.Add(DamageEvent.New(_currentTime, unit.id, hit.reflectedDamage, unit.curHp, unit.MaxHp));
-                        if (hit.lifeStealAmount > 0f) events.Add(RecoveryEvent.New(_currentTime, unit.id, hit.lifeStealAmount, unit.curHp, unit.MaxHp));
-                    }
-                    
-                    if (target.currentActionState == UnitActionState.Die)
-                    {
-                        events.Add(DieEvent.New(_currentTime, target.id));
-                    }
-                    else
-                    {
-                        events.Add(HitEvent.New(_currentTime, target.id, hit, target.curHp, target.MaxHp));
+                        var targetsInSector =  GetTargetsInSector(unit, areaAttack.attackRange, areaAttack.sectorAngle);
+                        foreach (var targetInSector in targetsInSector)
+                        {
+                            ApplyHit(events, unit, targetInSector, areaAttack.baseMultiplier);
+                        }
                     }
                 }
+            }
+        }
+
+        private void ApplyHit(ICollection<BattleEvent> events, UnitState unit, UnitState target, float baseMultiplier)
+        {
+            var hit = Calculate(unit, target, baseMultiplier);
+            unit.DoHit(hit);
+            target.OnHit(hit);
+            if (unit.currentActionState == UnitActionState.Die)
+            {
+                events.Add(DieEvent.New(_currentTime, unit.id));
+            }
+            else
+            {
+                if (hit.reflectedDamage > 0f) events.Add(DamageEvent.New(_currentTime, unit.id, hit.reflectedDamage, unit.curHp, unit.MaxHp));
+                if (hit.lifeStealAmount > 0f) events.Add(RecoveryEvent.New(_currentTime, unit.id, hit.lifeStealAmount, unit.curHp, unit.MaxHp));
+            }
+                    
+            if (target.currentActionState == UnitActionState.Die)
+            {
+                events.Add(DieEvent.New(_currentTime, target.id));
+            }
+            else
+            {
+                events.Add(HitEvent.New(_currentTime, target.id, hit, target.curHp, target.MaxHp));
             }
         }
 
